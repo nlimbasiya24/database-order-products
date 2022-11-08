@@ -1,6 +1,6 @@
 import { Shopify } from "@shopify/shopify-api";
 import { ProductSchema } from "../database/productData.js";
-import{orderSchema} from "../database/orderData.js" 
+import { orderSchema } from "../database/orderData.js";
 
 export async function storeOrderProduct(session) {
   const { Product } = await import(
@@ -10,29 +10,25 @@ export async function storeOrderProduct(session) {
     `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
   );
   const allProductsSave = await Product.all({ session });
-  // const allOrderSave = await Order.all({
-  //   session,
-  //   status: "any",
-  // });
-  allProductsSave.map(async (productData) => {
-    let OrderAndProductData = new ProductSchema();
-    OrderAndProductData.shop = session.shop;
-    OrderAndProductData.product_Id = productData.id;
-    OrderAndProductData.product_name = productData.title;
-    await OrderAndProductData.save();
-  });
-  // let OrderAndProductData = new orderAndProductSchema();
-  //    productArr.map((productData)=>{
-  //       OrderAndProductData.shop=productData.shop;
-  //       OrderAndProductData.product_Id = productData.product_Id;
-  //       OrderAndProductData.product_name = productData.product_name;
-  //       OrderAndProductData.save();
-  //     })
+  const allOrderSave = await Order.all({ session, status: "any" });
 
-  // const orderArr = allOrderSave.map((orderData) => {
-  //   const finalOrderData = { Order_id: orderData.id };
-  //   return finalOrderData;
-  // });
-  // console.log("productArr", productArr);
-  // console.log("OrderArr", orderArr);
+  allProductsSave.map(async (productData) => {
+    let ProductDataStore = new ProductSchema();
+    ProductDataStore.shop = session.shop;
+    ProductDataStore.product_Id = productData.id;
+    ProductDataStore.product_name = productData.title;
+    const response = await ProductDataStore.save();
+    // console.log("response",response)
+  });
+
+  allOrderSave.map(async (orderdata)=>{
+    let OrderDataStore=new orderSchema();
+    OrderDataStore.shop=session.shop;
+    OrderDataStore.order_Id=orderdata.id;
+    await OrderDataStore.save();
+  })
+
+
+
+  
 }
