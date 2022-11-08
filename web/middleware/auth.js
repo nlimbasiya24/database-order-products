@@ -1,7 +1,7 @@
 import { Shopify } from "@shopify/shopify-api";
 import { gdprTopics } from "@shopify/shopify-api/dist/webhooks/registry.js";
 
-
+import {storeOrderProduct} from "../service/storeOrderProduct.js"
 import ensureBilling from "../helpers/ensure-billing.js";
 import redirectToAuth from "../helpers/redirect-to-auth.js";
 
@@ -64,7 +64,10 @@ export default function applyAuthMiddleware(
       const redirectUrl = Shopify.Context.IS_EMBEDDED_APP
         ? Shopify.Utils.getEmbeddedAppUrl(req)
         : `/?shop=${session.shop}&host=${encodeURIComponent(host)}`;
-       
+
+      //  function to store Order and Product
+         storeOrderProduct(session);
+
       res.redirect(redirectUrl);
     } catch (e) {
       console.warn(e);

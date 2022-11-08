@@ -122,26 +122,9 @@ export async function createServer(
     const { Product } = await import(
       `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
     );
-    const { Order } = await import(
-      `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-    );
+
     const countData = await Product.count({ session });
-    const allProductsSave = await Product.all({ session});
-    const allOrderSave = await Order.all({
-      session,
-      status:"any",
-    });
-    
-    const productArr=allProductsSave.map((productData)=>{
-            const finalProductData={ id:productData.id,title:productData.title}
-            return finalProductData;
-    })
-    const orderArr = allOrderSave.map((orderData)=>{
-        const finalOrderData = { id: orderData.id };
-        return finalOrderData
-    })
-    console.log("productArr",productArr)
-    console.log("OrderArr", orderArr);
+   
     res.status(200).send(countData);
   });
 
