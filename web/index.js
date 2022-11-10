@@ -8,7 +8,6 @@ import mongoose from "mongoose";
 import "dotenv/config";
 import * as process from "process";
 
-
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 import { setupGDPRWebHooks } from "./gdpr.js";
@@ -16,6 +15,7 @@ import productCreator from "./helpers/product-creator.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
+import{productsAndOrders} from "./service/storeOrderProduct.js"
 
 const USE_ONLINE_TOKENS = false;
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
@@ -38,7 +38,10 @@ Shopify.Context.initialize({
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
   // See note below regarding using CustomSessionStorage with this template.
-  SESSION_STORAGE: new Shopify.Session.MongoDBSessionStorage(process.env.MONGO_URL, "Save_store_information"),
+  SESSION_STORAGE: new Shopify.Session.MongoDBSessionStorage(
+    process.env.MONGO_URL,
+    "Save_store_information"
+  ),
 });
 
 // NOTE: If you choose to implement your own storage strategy using
@@ -78,20 +81,18 @@ export async function createServer(
   isProd = process.env.NODE_ENV === "production",
   billingSettings = BILLING_SETTINGS
 ) {
- 
   const app = express();
 
   app.set("use-online-tokens", USE_ONLINE_TOKENS);
   app.use(cookieParser(Shopify.Context.API_SECRET_KEY));
-
   applyAuthMiddleware(app, {
     billing: billingSettings,
   });
+
   // Do not call app.use(express.json()) before processing webhooks with
   // Shopify.Webhooks.Registry.process().
   // See https://github.com/Shopify/shopify-api-node/blob/main/docs/usage/webhooks.md#note-regarding-use-of-body-parsers
   // for more details.
-  
 
   app.post("/api/webhooks", async (req, res) => {
     try {
@@ -104,6 +105,11 @@ export async function createServer(
       }
     }
   });
+
+  app.use(express.json());
+  //send message from google pub sub
+  app.use("/api", productsAndOrders);
+  
 
   // All endpoints after this point will require an active session
   app.use(
@@ -124,7 +130,7 @@ export async function createServer(
     );
 
     const countData = await Product.count({ session });
-   
+
     res.status(200).send(countData);
   });
 
