@@ -50,12 +50,12 @@ Shopify.Context.initialize({
 // required for the app_installations.js component in this template to
 // work properly.
 
-Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
-  path: "/api/webhooks",
-  webhookHandler: async (_topic, shop, _body) => {
-    await AppInstallations.delete(shop);
-  },
-});
+// Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
+//   path: "/api/webhooks",
+//   webhookHandler: async (_topic, shop, _body) => {
+//     await AppInstallations.delete(shop);
+//   },
+// });
 
 // The transactions with Shopify will always be marked as test transactions, unless NODE_ENV is production.
 // See the ensureBilling helper to learn more about billing in this template.
@@ -94,21 +94,22 @@ export async function createServer(
   // See https://github.com/Shopify/shopify-api-node/blob/main/docs/usage/webhooks.md#note-regarding-use-of-body-parsers
   // for more details.
 
-  app.post("/api/webhooks", async (req, res) => {
-    try {
-      await Shopify.Webhooks.Registry.process(req, res);
-      console.log(`Webhook processed, returned status code 200`);
-    } catch (e) {
-      console.log(`Failed to process webhook: ${e.message}`);
-      if (!res.headersSent) {
-        res.status(500).send(e.message);
-      }
-    }
-  });
+  // app.post("/api/webhooks", async (req, res) => {
+  //   try {
+  //     await Shopify.Webhooks.Registry.process(req, res);
+  //     console.log(`Webhook processed, returned status code 200`);
+  //   } catch (e) {
+  //     console.log(`Failed to process webhook: ${e.message}`);
+  //     if (!res.headersSent) {
+  //       res.status(500).send(e.message);
+  //     }
+  //   }
+  // });
 
   app.use(express.json());
   //send message from google pub sub
   app.use("/api", productsAndOrders);
+  
   
 
   // All endpoints after this point will require an active session
