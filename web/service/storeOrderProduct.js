@@ -85,14 +85,19 @@ productsAndOrders.post("/productCreate", async (req, res) => {
 
 productsAndOrders.post("/productDelete", async (req, res) => {
     const messageProductDelete = (await req.body) ? req.body.message : null;
-    if (messageProductDelete) {
+    try {
       const bufferProductDelete = Buffer.from(messageProductDelete.data,"base64");
       const dataProductDelete = bufferProductDelete?bufferProductDelete.toString(): null;
       await ProductSchema.findOneAndDelete({product_Id: JSON.parse(dataProductDelete).id.toString(),shop: messageProductDelete.attributes["X-Shopify-Shop-Domain"]})
-          .then((success) => console.log("success",success))
-          .catch((err) => console.log("error", err))
-     }
-     return res.sendStatus(204);
+          .then((success) => console.log("product deleting successfully",success))
+          .catch((err) => console.log("error in delete product", err))
+       return res.sendStatus(204);
+        }
+      catch(e){
+        console.log("Something wrong in pubsub",e.message)
+        return res.sendStatus(400);
+      }
+  
   });
 
 productsAndOrders.post("/productUpdate", async (req, res) => {
@@ -122,7 +127,8 @@ productsAndOrders.post("/appUninstall", async (req, res) => {
         return res.sendStatus(204);
       }
       catch(e){
-        console.log("Someting went wrong",e.message);
+        console.log("Someting went wrong in pubsub",e.message);
+        return res.sendStatus(400);
       }
     
     });
