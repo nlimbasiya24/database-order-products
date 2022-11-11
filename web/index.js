@@ -107,7 +107,7 @@ export async function createServer(
   // });
 
   app.use(express.json());
-  //send message from google pub sub
+  //send message from google pub sub this is the starting point
   app.use("/api", productsAndOrders);
   
   

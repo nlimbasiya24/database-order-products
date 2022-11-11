@@ -10,12 +10,8 @@ export default function applyAuthMiddleware(
   { billing = { required: false } } = { billing: { required: false } }
 ) {
   app.get("/api/auth", async (req, res) => {
-  
-    return redirectToAuth(req, res, app)
+      return redirectToAuth(req, res, app)
   });
-
- 
-  
   app.get("/api/auth/callback", async (req, res) => {
     try {
       const session = await Shopify.Auth.validateAuthCallback(

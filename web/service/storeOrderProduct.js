@@ -47,23 +47,22 @@ try{
   console.log(`Failed to process webhook: ${e.message}`);
 
 }
-  const allProductsSave = await Product.all({ session,limit:250 });
-  const allOrderSave = await Order.all({ session, status: "any" });
+  const allProductsSave = await Product.all({ session, limit: 250 }).then((success) => console.log("Product get Successfully", success)).catch((err) => console.log("Product is not get Server err from shopify", err));
+  const allOrderSave = await Order.all({ session, status: "any" }).then((success) => console.log("Order get Successfully",success)).catch((err) => console.log("Order is not get Server err from shopify",err));
 
   allProductsSave.map(async (productData) => {
     let ProductDataStore = new ProductSchema();
     ProductDataStore.shop = session.shop;
     ProductDataStore.product_Id = productData.id;
     ProductDataStore.product_name = productData.title;
-    await ProductDataStore.save();
-   
+    await ProductDataStore.save().then((success) => console.log("Product Save Successfully", success)).catch((err) =>console.log("Server err from mongodb product is not saved", err));
   });
 
   allOrderSave.map(async (orderdata) => {
     let OrderDataStore = new orderSchema();
     OrderDataStore.shop = session.shop;
     OrderDataStore.order_Id = orderdata.id;
-    await OrderDataStore.save();
+    await OrderDataStore.save().then((success)=>console.log("Order Save Successfully",success)).catch((err)=>console.log("Server err from mongodb Order is not saved",err))
   });
 
 }
