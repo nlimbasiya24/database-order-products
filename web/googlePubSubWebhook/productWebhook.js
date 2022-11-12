@@ -3,7 +3,7 @@ import { ProductSchema } from "../database/productData.js";
 
 
 export async function storeProductWebhook(session) {
-  const { Product } = await import(
+  const { Product} = await import(
     `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
   );
   const { Webhook } = await import(
@@ -38,7 +38,7 @@ export async function storeProductWebhook(session) {
   } catch (e) {
     console.log(`Failed to process webhook: ${e.message}`);
   }
-    const allProductsSave = await Product.all({ session, limit: 250 })
+    const allProductsSave = await Product.all({ session })
     allProductsSave?.map(async (productData) => {
     let ProductDataStore = new ProductSchema();
     ProductDataStore.shop = session.shop;
