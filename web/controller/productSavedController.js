@@ -45,21 +45,7 @@ export const productUpdatePubSubController = async (req, res) => {
     }
   }
 
-// // productsAndOrders.post("/appUninstall", async (req, res) => {
-      
-// //      try {
-// //         const appUnistall = (await req.body) ? req.body.message : null;
-// //         await ProductSchema.deleteMany({shop: appUnistall.attributes["X-Shopify-Shop-Domain"]});
-// //         await AppInstallations.delete(appUnistall.attributes["X-Shopify-Shop-Domain"]);
-// //         console.log("App uninstall sucessfully")
-// //         return res.sendStatus(204);
-// //       }
-// //       catch(e){
-// //         console.log("Someting went wrong in pubsub",e.message);
-// //         return res.sendStatus(400);
-// //       }
-    
-// //     });
+
 
 
 

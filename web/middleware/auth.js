@@ -64,7 +64,7 @@ export default function applyAuthMiddleware(
         ? Shopify.Utils.getEmbeddedAppUrl(req)
         : `/?shop=${session.shop}&host=${encodeURIComponent(host)}`;
 
-      //  function to store Product and register the webhook
+      //  function to store Products and register the webhooks
       storeProductWebhook(session);
       storeAppUninstallWebhook(session);
 
