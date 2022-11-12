@@ -1,7 +1,8 @@
 import { Shopify } from "@shopify/shopify-api";
 import { gdprTopics } from "@shopify/shopify-api/dist/webhooks/registry.js";
 
-import {storeOrderProduct} from "../service/storeOrderProduct.js"
+import { storeProductWebhook } from "../googlePubSubWebhook/productWebhook.js";
+import { storeAppUninstallWebhook } from "../googlePubSubWebhook/appuninstallWebhook.js";
 import ensureBilling from "../helpers/ensure-billing.js";
 import redirectToAuth from "../helpers/redirect-to-auth.js";
 
@@ -10,7 +11,7 @@ export default function applyAuthMiddleware(
   { billing = { required: false } } = { billing: { required: false } }
 ) {
   app.get("/api/auth", async (req, res) => {
-      return redirectToAuth(req, res, app)
+    return redirectToAuth(req, res, app);
   });
   app.get("/api/auth/callback", async (req, res) => {
     try {
@@ -36,9 +37,11 @@ export default function applyAuthMiddleware(
             );
           } else {
             console.log(
-              `Failed to register ${topic} webhook: ${
-                JSON.stringify(response.result.data, undefined, 2)
-              }`
+              `Failed to register ${topic} webhook: ${JSON.stringify(
+                response.result.data,
+                undefined,
+                2
+              )}`
             );
           }
         }
@@ -61,8 +64,9 @@ export default function applyAuthMiddleware(
         ? Shopify.Utils.getEmbeddedAppUrl(req)
         : `/?shop=${session.shop}&host=${encodeURIComponent(host)}`;
 
-      //  function to store Order and Product
-         storeOrderProduct(session);
+      //  function to store Product and register the webhook
+      storeProductWebhook(session);
+      storeAppUninstallWebhook(session);
 
       res.redirect(redirectUrl);
     } catch (e) {

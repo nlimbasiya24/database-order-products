@@ -15,7 +15,8 @@ import productCreator from "./helpers/product-creator.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
-import{productsAndOrders} from "./service/storeOrderProduct.js"
+import { productSavedDB } from "./v1/routes/productSavedDatabase.js"
+import {AppUninstallDB} from "./v1/routes/appuninstallDatabase.js"
 
 const USE_ONLINE_TOKENS = false;
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
@@ -108,9 +109,8 @@ export async function createServer(
 
   app.use(express.json());
   //send message from google pub sub this is the starting point
-  app.use("/api", productsAndOrders);
-  
-  
+  app.use("/api/v1/products", productSavedDB);
+  app.use("/api/v1/app", AppUninstallDB);
 
   // All endpoints after this point will require an active session
   app.use(
