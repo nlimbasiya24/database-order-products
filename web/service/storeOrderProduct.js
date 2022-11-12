@@ -94,8 +94,9 @@ productsAndOrders.post("/productCreate", async (req, res) => {
   });
 
 productsAndOrders.post("/productDelete", async (req, res) => {
-    const messageProductDelete = (await req.body) ? req.body.message : null;
+    
     try {
+      const messageProductDelete = (await req.body) ? req.body.message : null;
       const bufferProductDelete = Buffer.from(messageProductDelete.data,"base64");
       const dataProductDelete = bufferProductDelete?bufferProductDelete.toString(): null;
       await ProductSchema.findOneAndDelete({product_Id: JSON.parse(dataProductDelete).id.toString(),shop: messageProductDelete.attributes["X-Shopify-Shop-Domain"]})
@@ -111,21 +112,24 @@ productsAndOrders.post("/productDelete", async (req, res) => {
   });
 
 productsAndOrders.post("/productUpdate", async (req, res) => {
-      const messageProductUpdate = (await req.body) ? req.body.message : null;
-      if (messageProductUpdate) {
-        const bufferProductUpdate = Buffer.from(
-          messageProductUpdate.data,
-          "base64"
-        );
-        const dataProductUpdate = bufferProductUpdate
-          ? bufferProductUpdate.toString()
-          : null;
+  try{
+        const messageProductUpdate = (await req.body) ? req.body.message : null;
+        const bufferProductUpdate = Buffer.from(messageProductUpdate.data,"base64");
+        const dataProductUpdate = bufferProductUpdate? bufferProductUpdate.toString():null;
 
-        console.log(`Received message ${messageProductUpdate.messageId}:`);
-        console.log(`Data: ${dataProductUpdate}`);
-      }
-
-      return res.send(204);
+        await ProductSchema.findOneAndUpdate(
+          {
+            shop: messageProductUpdate.attributes["X-Shopify-Shop-Domain"],
+            product_Id: JSON.parse(dataProductUpdate).id.toString(),
+          },
+          { product_name: JSON.parse(dataProductUpdate).title.toString()}
+        ).then((success)=>console.log("Product Update Successfully",success))
+        .catch((err)=>console.log("error in product update",err));
+        return res.sendStatus(204);
+    }catch(e){
+      console.log("There is some error from google pub sub")
+      return res.sendStatus(400);
+    }
   });
 
 productsAndOrders.post("/appUninstall", async (req, res) => {
