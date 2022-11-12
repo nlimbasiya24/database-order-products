@@ -2,36 +2,39 @@
 import { ProductSchema } from "../database/productData.js";
 
 
+//can this function be only used with PubSub? can we use this function to save product which might have been retrieved via an API call
 export async function productCreatePubSubService(messageProductCreate) {
 
      const dataProductCreate = Buffer.from(messageProductCreate.data,"base64").toString();
-     
+
      let ProductDataStorepubsub = new ProductSchema();
-     
+
      ProductDataStorepubsub.shop =messageProductCreate.attributes["X-Shopify-Shop-Domain"];
+
+     //should parse the object first and then extract all the required data from it.
      ProductDataStorepubsub.product_Id = JSON.parse(dataProductCreate).id.toString();
      ProductDataStorepubsub.product_name = JSON.parse(dataProductCreate).title.toString();
 
      await ProductDataStorepubsub.save().then((success) =>
-        console.log("Product Save Successfully this is google pubsub", success)
+        console.log("Product Save Successfully this is google pubsub", success) //do we get the productID in the log?
       ).catch((err) =>
-        console.log("Server err from mongodb product is not saved", err)
+        console.log("Server err from mongodb product is not saved", err) //do we get the productID in the log?
       );
-   
-  
+
+
 };
 
 export async function productDeletePubSubService(messageProductDelete) {
- 
+
     const dataProductDelete = Buffer.from(messageProductDelete.data,"base64").toString();
     await ProductSchema.findOneAndDelete({product_Id: JSON.parse(dataProductDelete).id.toString(),shop: messageProductDelete.attributes["X-Shopify-Shop-Domain"]})
       .then((success) => console.log("product deleting successfully", success))
       .catch((err) => console.log("error in delete product", err));
-   
+
   }
 
 export async function productUpdatePubSubService(messageProductUpdate) {
- 
+
     const dataProductUpdate = Buffer.from(messageProductUpdate.data,"base64").toString();
     await ProductSchema.findOneAndUpdate({
         shop: messageProductUpdate.attributes["X-Shopify-Shop-Domain"],
