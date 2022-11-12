@@ -70,16 +70,27 @@ try{
 export const productsAndOrders=express.Router();
 
 productsAndOrders.post("/productCreate", async (req, res) => {
-   const messageProductCreate = await req.body ? req.body.message : null;
-   if (messageProductCreate) {
+
+  try{
+      const messageProductCreate = await req.body ? req.body.message : null;
       const bufferProductCreate = Buffer.from(messageProductCreate.data, "base64");
       const dataProductCreate = bufferProductCreate ? bufferProductCreate.toString() : null;
-
-      console.log(`Received message ${messageProductCreate.messageId}:`); 
-      console.log(`Received message ${messageProductCreate.attributes}:`);
-      console.log(`Data: ${dataProductCreate}`);
+       
+      let ProductDataStorepubsub = new ProductSchema();
+       ProductDataStorepubsub.shop = messageProductCreate.attributes["X-Shopify-Shop-Domain"];  
+       ProductDataStorepubsub.product_Id = JSON.parse(dataProductCreate).id.toString();
+       ProductDataStorepubsub.product_name=JSON.parse(dataProductCreate).title.toString();
+       await ProductDataStorepubsub.save()
+        .then((success) => console.log("Product Save Successfully this is google pubsub", success))
+        .catch((err) =>
+          console.log("Server err from mongodb product is not saved", err)
+        );
+      return res.sendStatus(204);
+    }catch(e){
+      console.log("There is a some error in google pubsub")
+      return res.sendStatus(400);
     }
-   return res.send(204);
+   
   });
 
 productsAndOrders.post("/productDelete", async (req, res) => {
@@ -118,8 +129,9 @@ productsAndOrders.post("/productUpdate", async (req, res) => {
   });
 
 productsAndOrders.post("/appUninstall", async (req, res) => {
-      const appUnistall = (await req.body) ? req.body.message : null;
+      
      try {
+        const appUnistall = (await req.body) ? req.body.message : null;
         await ProductSchema.deleteMany({shop: appUnistall.attributes["X-Shopify-Shop-Domain"]});
         await AppInstallations.delete(appUnistall.attributes["X-Shopify-Shop-Domain"]);
         console.log("App uninstall sucessfully")
