@@ -45,36 +45,12 @@ Shopify.Context.initialize({
   ),
 });
 
-// NOTE: If you choose to implement your own storage strategy using
-// Shopify.Session.CustomSessionStorage, you MUST implement the optional
-// findSessionsByShopCallback and deleteSessionsCallback methods.  These are
-// required for the app_installations.js component in this template to
-// work properly.
 
-// Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
-//   path: "/api/webhooks",
-//   webhookHandler: async (_topic, shop, _body) => {
-//     await AppInstallations.delete(shop);
-//   },
-// });
-
-// The transactions with Shopify will always be marked as test transactions, unless NODE_ENV is production.
-// See the ensureBilling helper to learn more about billing in this template.
 const BILLING_SETTINGS = {
   required: false,
-  // This is an example configuration that would do a one-time charge for $5 (only USD is currently supported)
-  // chargeName: "My Shopify One-Time Charge",
-  // amount: 5.0,
-  // currencyCode: "USD",
-  // interval: BillingInterval.OneTime,
+  
 };
 
-// This sets up the mandatory GDPR webhooks. You’ll need to fill in the endpoint
-// in the “GDPR mandatory webhooks” section in the “App setup” tab, and customize
-// the code when you store customer data.
-//
-// More details can be found on shopify.dev:
-// https://shopify.dev/apps/webhooks/configuration/mandatory-webhooks
 setupGDPRWebHooks("/api/webhooks");
 
 export async function createServer(
@@ -89,24 +65,6 @@ export async function createServer(
   applyAuthMiddleware(app, {
     billing: billingSettings,
   });
-
-  // Do not call app.use(express.json()) before processing webhooks with
-  // Shopify.Webhooks.Registry.process().
-  // See https://github.com/Shopify/shopify-api-node/blob/main/docs/usage/webhooks.md#note-regarding-use-of-body-parsers
-  // for more details.
-
-  // app.post("/api/webhooks", async (req, res) => {
-  //   try {
-  //     await Shopify.Webhooks.Registry.process(req, res);
-  //     console.log(`Webhook processed, returned status code 200`);
-  //   } catch (e) {
-  //     console.log(`Failed to process webhook: ${e.message}`);
-  //     if (!res.headersSent) {
-  //       res.status(500).send(e.message);
-  //     }
-  //   }
-  // });
-
   app.use(express.json());
   //send message from google pub sub this is the starting point
   app.use("/api/v1/products", productSavedDB);
@@ -134,6 +92,23 @@ export async function createServer(
 
     res.status(200).send(countData);
   });
+  //  app.get("/api/orders/count", async (req, res) => {
+  //    const session = await Shopify.Utils.loadCurrentSession(
+  //      req,
+  //      res,
+  //      app.get("use-online-tokens")
+  //    );
+  //    const { Order } = await import(
+  //      `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+  //    ); 
+
+  //    const countOrderData = await Order.count({ session });
+
+  //   //  console.log("countOrderData",countOrderData)
+
+  //    res.status(200).send(countOrderData);
+  //  });
+
 
   app.get("/api/products/create", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(

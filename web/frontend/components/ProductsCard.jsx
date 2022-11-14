@@ -12,6 +12,7 @@ import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 export function ProductsCard() {
   const emptyToastProps = { content: null };
   const [isLoading, setIsLoading] = useState(true);
+  // const [isLoadingOrder, setIsLoadingOrder] = useState(true);
   const [toastProps, setToastProps] = useState(emptyToastProps);
   const fetch = useAuthenticatedFetch();
 
@@ -28,6 +29,19 @@ export function ProductsCard() {
       },
     },
   });
+
+    // const {
+    //   data,
+    //   // refetch: refetchOrderCount,
+    //   // isLoading:isLoadingCountOrder,isRefetching: isRefetchingCountOrder,
+    // } = useAppQuery({
+    //   url: "/api/orders/count",
+    //   reactQueryOptions: {
+    //     onSuccess: () => {
+    //       setIsLoadingOrder(false);
+    //     },
+    //   },
+    // });
 
   const toastMarkup = toastProps.content && !isRefetchingCount && (
     <Toast {...toastProps} onDismiss={() => setToastProps(emptyToastProps)} />
@@ -48,6 +62,22 @@ export function ProductsCard() {
       });
     }
   };
+
+  // const handlePopulateorder = async () => {
+  //   setIsLoading(true);
+  //   const response = await fetch("/api/orders/create");
+
+  //   if (response.ok) {
+  //     await refetchOrderCount();
+  //     setToastProps({ content: "5 Order created!" });
+  //   } else {
+  //     setIsLoading(false);
+  //     setToastProps({
+  //       content: "There was an error creating Orders",
+  //       error: true,
+  //     });
+  //   }
+  // };
 
   return (
     <>
@@ -76,6 +106,31 @@ export function ProductsCard() {
           </Heading>
         </TextContainer>
       </Card>
+
+      {/* <Card
+        title="Order Counter"
+        sectioned
+        primaryFooterAction={{
+          content: "Populate 5 Order",
+          onAction: handlePopulateorder,
+          loading: isLoadingOrder,
+        }}
+      >
+        <TextContainer spacing="loose">
+          <p>
+            Sample Order are created with a default title and price. You can
+            remove them at any time.
+          </p>
+          <Heading element="h4">
+            TOTAL ORDER
+            <DisplayText size="medium">
+              <TextStyle variation="strong">
+                {isLoadingCountOrder ? "-" : dataOrder.count}
+              </TextStyle>
+            </DisplayText>
+          </Heading>
+        </TextContainer>
+      </Card> */}
     </>
   );
 }
